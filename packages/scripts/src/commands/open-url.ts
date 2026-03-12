@@ -19,14 +19,15 @@ export function openUrlCommand(args: string[]): void {
 
 	try {
 		const parsed = new URL(url);
-		if (parsed.hostname === APP_DOMAIN) {
+		if (parsed.protocol === "https:" && parsed.hostname === APP_DOMAIN) {
 			const path = parsed.pathname.slice(1) + parsed.search + parsed.hash;
 			openDeepLink(path);
 			info("Opening in Superset...");
 			return;
 		}
-	} catch {
-		// Not a valid URL
+	} catch (e) {
+		error(`Invalid URL: ${e instanceof Error ? e.message : String(e)}`);
+		process.exit(1);
 	}
 
 	error(

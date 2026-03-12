@@ -1,4 +1,4 @@
-import { findProjectByPath, findWorkspaceByBranch } from "../lib/db.js";
+import { findWorkspaceByBranch, resolveProject } from "../lib/db.js";
 import { openDeepLink } from "../lib/deep-link.js";
 import { error, info } from "../lib/output.js";
 import { getCurrentBranch, resolveProjectPath } from "../lib/resolve.js";
@@ -12,7 +12,7 @@ export function prCommand(): void {
 		process.exit(1);
 	}
 
-	const project = findProjectByPath(absPath);
+	const project = resolveProject(absPath);
 	if (!project) {
 		error("No Superset project found for this directory.");
 		process.exit(1);

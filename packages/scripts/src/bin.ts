@@ -1,4 +1,6 @@
 #!/usr/bin/env bun
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { branchCommand } from "./commands/branch.js";
 import { configCommand } from "./commands/config.js";
 import { devCommand } from "./commands/dev.js";
@@ -12,7 +14,10 @@ import { statusCommand } from "./commands/status.js";
 import { worktreeCommand } from "./commands/worktree.js";
 import { bold, dim } from "./lib/output.js";
 
-const VERSION = "0.1.0";
+const pkg = JSON.parse(
+	readFileSync(join(import.meta.dirname, "../package.json"), "utf-8"),
+);
+const VERSION: string = pkg.version;
 
 const args = process.argv.slice(2);
 const command = args[0];

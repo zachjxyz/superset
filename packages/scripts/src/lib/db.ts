@@ -37,18 +37,19 @@ export interface Worktree {
 	base_branch: string | null;
 }
 
-function getDb(): Database {
-	if (!existsSync(DB_PATH)) {
-		throw new Error(
-			"Superset database not found. Is the desktop app installed?",
-		);
-	}
+function getDb(): Database | null {
+	if (!existsSync(DB_PATH)) return null;
 
-	return new Database(DB_PATH, { readonly: true });
+	try {
+		return new Database(DB_PATH, { readonly: true });
+	} catch {
+		return null;
+	}
 }
 
 export function findProjectByPath(absPath: string): Project | null {
 	const db = getDb();
+	if (!db) return null;
 	return db
 		.query<Project, [string]>(
 			"SELECT * FROM projects WHERE main_repo_path = ? LIMIT 1",
@@ -56,8 +57,25 @@ export function findProjectByPath(absPath: string): Project | null {
 		.get(absPath);
 }
 
+export function findProjectByWorktreePath(absPath: string): Project | null {
+	const db = getDb();
+	if (!db) return null;
+	return db
+		.query<Project, [string]>(
+			`SELECT p.* FROM projects p
+			JOIN worktrees wt ON wt.project_id = p.id
+			WHERE wt.path = ? LIMIT 1`,
+		)
+		.get(absPath);
+}
+
+export function resolveProject(absPath: string): Project | null {
+	return findProjectByPath(absPath) ?? findProjectByWorktreePath(absPath);
+}
+
 export function getAllProjects(): Project[] {
 	const db = getDb();
+	if (!db) return [];
 	return db
 		.query<Project, []>("SELECT * FROM projects ORDER BY last_opened_at DESC")
 		.all();
@@ -78,6 +96,7 @@ export function getWorkspacesForProject(
 	projectId: string,
 ): WorkspaceWithWorktree[] {
 	const db = getDb();
+	if (!db) return [];
 	return db
 		.query<WorkspaceWithWorktree, [string]>(
 			`SELECT
@@ -102,6 +121,7 @@ export function findWorkspaceByBranch(
 	branch: string,
 ): Workspace | null {
 	const db = getDb();
+	if (!db) return null;
 	return db
 		.query<Workspace, [string, string]>(
 			"SELECT * FROM workspaces WHERE project_id = ? AND branch = ? AND deleting_at IS NULL LIMIT 1",
