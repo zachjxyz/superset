@@ -1,4 +1,4 @@
-import { findProjectByPath, getWorkspacesForProject } from "../lib/db.js";
+import { getWorkspacesForProject, resolveProject } from "../lib/db.js";
 import { bold, cyan, dim, error, info } from "../lib/output.js";
 import {
 	getCurrentBranch,
@@ -15,7 +15,7 @@ export function statusCommand(): void {
 		process.exit(1);
 	}
 
-	const project = findProjectByPath(absPath);
+	const project = resolveProject(absPath);
 	if (!project) {
 		info("No Superset project found for this directory.");
 		return;

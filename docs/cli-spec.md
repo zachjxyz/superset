@@ -8,7 +8,7 @@ The `superset` CLI lets users interact with the Superset desktop app from the te
 
 ## Architecture
 
-```
+```text
 ┌──────────────┐         superset://          ┌──────────────────┐
 │  superset    │  ──── deep link protocol ──► │  Desktop App     │
 │  CLI binary  │                              │  (Electron)      │
@@ -47,7 +47,7 @@ Follows the existing `@superset/desktop-mcp` pattern: `bin` field in `package.js
 
 Open a project in the desktop app.
 
-```
+```bash
 superset .                  # open cwd
 superset ~/Projects/myapp   # open specific path
 ```
@@ -66,7 +66,7 @@ superset ~/Projects/myapp   # open specific path
 
 Open a project with a named worktree workspace. Path defaults to cwd.
 
-```
+```bash
 superset worktree my-feature
 superset worktree hotfix-auth ~/Projects/myapp
 ```
@@ -84,7 +84,7 @@ This creates a full git worktree — a separate working directory with its own c
 
 Open a project with a branch-type workspace. Path defaults to cwd.
 
-```
+```bash
 superset branch feature/onboarding
 superset branch fix/typo ~/Projects/myapp
 ```
@@ -101,7 +101,7 @@ Unlike `worktree`, this is lightweight — no separate directory on disk, just a
 
 Open the built-in browser pane for the current workspace's dev server. Equivalent to pressing `cmd+shift+b` in the app, but pre-navigated to the detected (or specified) port.
 
-```
+```bash
 superset dev         # auto-detect running dev server port
 superset dev 3001    # open browser to localhost:3001
 ```
@@ -119,7 +119,7 @@ superset dev 3001    # open browser to localhost:3001
 
 Initiate authentication.
 
-```
+```bash
 superset login
 ```
 
@@ -134,7 +134,7 @@ superset login
 
 Clear the current auth session.
 
-```
+```bash
 superset logout
 ```
 
@@ -148,12 +148,12 @@ superset logout
 
 Show project and workspace info for the current directory. This is a read-only command — it queries the local SQLite database directly without needing the desktop app to be running.
 
-```
+```bash
 superset status
 ```
 
 **Example output:**
-```
+```text
 Project:    myapp
 Path:       ~/Projects/myapp
 Branch:     main
@@ -165,7 +165,7 @@ Workspaces: 3 (2 worktree, 1 branch)
 
 **Flow:**
 1. Resolve cwd to absolute path
-2. Query `projects` table by `mainRepoPath`
+2. Query `projects` table by `mainRepoPath`, falling back to `worktrees` table by `path` (supports running from inside a worktree directory)
 3. Query `workspaces` and `worktrees` tables by `projectId`
 4. Print formatted output
 
@@ -177,12 +177,12 @@ If no project found: `No Superset project found for this directory.`
 
 List all known projects. Read-only, queries local SQLite directly.
 
-```
+```bash
 superset list
 ```
 
 **Example output:**
-```
+```text
 Projects:
   myapp         ~/Projects/myapp          last opened 2h ago
   website       ~/Projects/website        last opened 1d ago
@@ -195,7 +195,7 @@ Projects:
 
 Open the PR view for the current branch's workspace.
 
-```
+```bash
 superset pr
 ```
 
@@ -209,7 +209,7 @@ superset pr
 
 Open a Superset URL directly in the desktop app. Useful for opening shared links (e.g., from Slack or a browser) in the native app instead of the web.
 
-```
+```bash
 superset open https://app.superset.sh/workspace/abc123
 superset open superset://project/xyz
 ```
@@ -225,7 +225,7 @@ superset open superset://project/xyz
 
 View and manage CLI configuration.
 
-```
+```bash
 superset config                  # show current config
 superset config set <key> <val>  # set a config value
 superset config get <key>        # get a config value

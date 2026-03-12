@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 
-const PROTOCOL = "superset";
+const PROTOCOL = process.env.SUPERSET_PROTOCOL ?? "superset";
 
 export function openDeepLink(path: string): void {
 	const url = `${PROTOCOL}://${path}`;

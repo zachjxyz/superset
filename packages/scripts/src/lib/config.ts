@@ -34,7 +34,10 @@ export function loadConfig(): CliConfig {
 	try {
 		const raw = JSON.parse(readFileSync(CONFIG_PATH, "utf-8"));
 		return { ...DEFAULTS, ...raw };
-	} catch {
+	} catch (e) {
+		console.warn(
+			`Warning: could not read CLI config at ${CONFIG_PATH}, using defaults: ${e instanceof Error ? e.message : String(e)}`,
+		);
 		return { ...DEFAULTS };
 	}
 }
@@ -42,7 +45,7 @@ export function loadConfig(): CliConfig {
 export function saveConfig(config: CliConfig): void {
 	const dir = dirname(CONFIG_PATH);
 	if (!existsSync(dir)) {
-		mkdirSync(dir, { recursive: true });
+		mkdirSync(dir, { recursive: true, mode: 0o700 });
 	}
 	writeFileSync(CONFIG_PATH, `${JSON.stringify(config, null, 2)}\n`);
 }
@@ -56,7 +59,7 @@ export function resetConfig(): void {
 export function setConfigValue(key: string, value: string): CliConfig {
 	const config = loadConfig();
 
-	if (!(key in DEFAULTS)) {
+	if (!Object.hasOwn(DEFAULTS, key)) {
 		throw new Error(
 			`Unknown config key: ${key}. Valid keys: ${Object.keys(DEFAULTS).join(", ")}`,
 		);
